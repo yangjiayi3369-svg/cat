@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>浮窗播放器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 主容器 -->
+    <div id="container" class="container">
+        <!-- 视频元素 -->
+        <video 
+            id="video" 
+            class="video"
+            playsinline
+            webkit-playsinline
+        ></video>
+    </div>
+
+    <!-- 右键���单 -->
+    <div id="contextMenu" class="context-menu">
+        <div class="menu-section">
+            <div class="menu-title">缩放</div>
+            <div class="menu-item" data-action="zoom-0.8">0.8x</div>
+            <div class="menu-item" data-action="zoom-1">1x</div>
+            <div class="menu-item" data-action="zoom-1.2">1.2x</div>
+            <div class="menu-item" data-action="zoom-1.5">1.5x</div>
+        </div>
+
+        <div class="menu-divider"></div>
+
+        <div class="menu-section">
+            <div class="menu-item" data-action="toggle-top">置顶</div>
+            <div class="menu-item" data-action="toggle-transparent">鼠标穿透</div>
+        </div>
+
+        <div class="menu-divider"></div>
+
+        <div class="menu-section">
+            <div class="menu-item" data-action="open-video">更换视频</div>
+            <div class="menu-item" data-action="exit">退出</div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
