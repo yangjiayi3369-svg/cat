@@ -1,322 +1,388 @@
 /* ==================== 全局重置 ==================== */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html, body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: transparent;
-    user-select: none;
-    -webkit-user-select: none;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: no-drag;
 }
 
-/* ==================== 主容器（浮窗） ==================== */
+/* ==================== 主容器（透明浮窗） ==================== */
 .container {
-    position: fixed;
-    top: 100px;
-    left: 100px;
-    width: 600px;
-    height: 338px;
-    background: transparent;
-    border-radius: 12px;
-    overflow: hidden;
-    cursor: move;
-    z-index: 1000;
-    
-    /* 浮窗阴影效果 */
-    box-shadow: 
-        0 2px 4px rgba(0, 0, 0, 0.08),
-        0 4px 8px rgba(0, 0, 0, 0.12),
-        0 12px 28px rgba(0, 0, 0, 0.2),
-        0 24px 56px rgba(0, 0, 0, 0.15);
-    
-    /* 毛玻璃效果（可选） */
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
-    
-    /* 边框平滑 */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    
-    /* 过渡效果 */
-    transition: all 0.3s ease;
-    
-    /* 强制透明背景 */
-    background-color: transparent !important;
+  position: fixed;
+  top: 100px;
+  left: 100px;
+  width: 600px;
+  height: 338px;
+  background: transparent !important;
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 1000;
+  
+  /* Windows 透明窗口兼容 */
+  -webkit-app-region: drag;
+  
+  /* 浮窗阴影（多层递进） */
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    0 4px 8px rgba(0, 0, 0, 0.12),
+    0 12px 28px rgba(0, 0, 0, 0.2),
+    0 24px 56px rgba(0, 0, 0, 0.15);
+  
+  /* 毛玻璃背景 */
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  
+  /* 平滑边框（避免黑边） */
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  
+  /* 平滑过渡 */
+  transition: box-shadow 0.3s ease, opacity 0.3s ease;
 }
 
-/* ==================== 容器悬停效果 ==================== */
-.container:hover {
-    box-shadow: 
-        0 4px 8px rgba(0, 0, 0, 0.12),
-        0 8px 16px rgba(0, 0, 0, 0.16),
-        0 16px 40px rgba(0, 0, 0, 0.24),
-        0 32px 64px rgba(0, 0, 0, 0.2);
+/* 获焦状态 */
+.container.focused {
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    0 4px 8px rgba(0, 0, 0, 0.12),
+    0 12px 28px rgba(0, 0, 0, 0.2),
+    0 24px 56px rgba(0, 0, 0, 0.15);
+  opacity: 1;
+}
+
+/* 失焦状态（避免灰边） */
+.container:not(.focused) {
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 4px 8px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.15),
+    0 16px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* 鼠标穿透状态 */
+.container.mouse-transparent {
+  opacity: 0.8;
+  pointer-events: none;
+  -webkit-app-region: no-drag;
+}
+
+.container.mouse-transparent .video {
+  pointer-events: none;
+}
+
+/* 悬停效果 */
+.container:hover:not(.mouse-transparent) {
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.12),
+    0 8px 16px rgba(0, 0, 0, 0.16),
+    0 16px 40px rgba(0, 0, 0, 0.24),
+    0 32px 64px rgba(0, 0, 0, 0.2);
 }
 
 /* ==================== 视频元素 ==================== */
 .video {
-    width: 100%;
-    height: 100%;
-    display: block;
-    background: transparent;
-    background-color: transparent !important;
-    object-fit: contain;
-    
-    /* 防止默认浏览器控件 */
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-    
-    /* 平滑缩放 */
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: transparent !important;
+  background-color: transparent !important;
+  object-fit: contain;
+  
+  /* 防止选择 */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  
+  /* 高质量缩放 */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  
+  /* 防止拖拽 */
+  -webkit-app-region: no-drag;
+}
+
+/* 隐藏视频控制栏 */
+.video::-webkit-media-controls {
+  display: none !important;
+}
+
+.video::-webkit-media-controls-panel {
+  display: none !important;
 }
 
 /* ==================== 右键菜单 ==================== */
 .context-menu {
-    display: none;
-    position: fixed;
-    z-index: 10000;
-    
-    /* 菜单样式 */
-    background: rgba(30, 30, 30, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    box-shadow: 
-        0 4px 12px rgba(0, 0, 0, 0.3),
-        0 8px 24px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    
-    /* 动画 */
-    animation: menuSlideIn 0.15s ease-out;
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  
+  /* 菜单样式 */
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    0 8px 24px rgba(0, 0, 0, 0.2);
+  
+  /* 毛玻璃效果 */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  
+  /* 防止选择和拖拽 */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: no-drag;
+  
+  /* 动画 */
+  animation: contextMenuSlideIn 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@keyframes menuSlideIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95) translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
+@keyframes contextMenuSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 /* ==================== 菜单分组 ==================== */
 .menu-section {
-    padding: 8px 0;
+  padding: 8px 0;
 }
 
 .menu-section:first-child {
-    padding-top: 8px;
+  padding-top: 10px;
 }
 
 .menu-section:last-child {
-    padding-bottom: 8px;
+  padding-bottom: 10px;
 }
 
 /* ==================== 菜单标题 ==================== */
 .menu-title {
-    padding: 8px 16px;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    user-select: none;
+  padding: 6px 16px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* ==================== 菜单项 ==================== */
 .menu-item {
-    padding: 10px 20px;
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    user-select: none;
-    white-space: nowrap;
-    
-    /* 默认状态 */
-    background: transparent;
+  padding: 10px 20px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  white-space: nowrap;
+  background: transparent;
+  -webkit-app-region: no-drag;
 }
 
 .menu-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    padding-left: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding-left: 24px;
 }
 
 .menu-item:active {
-    background: rgba(255, 255, 255, 0.15);
-    transform: scale(0.98);
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(0.98);
+}
+
+.menu-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ==================== 菜单分隔线 ==================== */
 .menu-divider {
-    height: 1px;
-    background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.1) 50%,
-        rgba(255, 255, 255, 0) 100%
-    );
-    margin: 4px 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  margin: 4px 0;
 }
 
 /* ==================== 转换进度条 ==================== */
 #conversionProgress {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #ff6b9d 0%, #c06c84 100%);
-    box-shadow: 0 0 10px rgba(255, 107, 157, 0.6);
-    z-index: 10001;
-    animation: progressPulse 1s ease-in-out infinite;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ff6b9d 0%, #c06c84 100%);
+  box-shadow: 
+    0 0 10px rgba(255, 107, 157, 0.6),
+    0 0 20px rgba(255, 107, 157, 0.3);
+  z-index: 10001;
+  animation: progressPulse 1s ease-in-out infinite;
+  -webkit-app-region: no-drag;
 }
 
 @keyframes progressPulse {
-    0%, 100% {
-        box-shadow: 0 0 10px rgba(255, 107, 157, 0.6);
-    }
-    50% {
-        box-shadow: 0 0 20px rgba(255, 107, 157, 0.8);
-    }
+  0%, 100% {
+    box-shadow: 
+      0 0 10px rgba(255, 107, 157, 0.6),
+      0 0 20px rgba(255, 107, 157, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 0 20px rgba(255, 107, 157, 0.8),
+      0 0 30px rgba(255, 107, 157, 0.5);
+  }
 }
 
-/* ==================== Retina / 高 DPI 屏幕适配 ==================== */
+/* ==================== Retina / 高 DPI 屏幕 ==================== */
 @media (min-resolution: 192dpi) {
-    .video {
-        /* 高 DPI 屏幕优化 */
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
+  .video,
+  .menu-item {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .container {
+    border-radius: 14px;
+  }
 }
 
-/* ==================== 超高 DPI（3x）屏幕 ==================== */
 @media (min-resolution: 288dpi) {
-    .container {
-        border-radius: 14px;
-    }
-    
-    .context-menu {
-        border-radius: 10px;
-    }
+  .container {
+    border-radius: 16px;
+  }
+
+  .context-menu {
+    border-radius: 10px;
+  }
 }
 
-/* ==================== 深色模式适配 ==================== */
+/* ==================== 深色模式（Windows 11） ==================== */
 @media (prefers-color-scheme: dark) {
-    .context-menu {
-        background: rgba(20, 20, 20, 0.96);
-        border-color: rgba(255, 255, 255, 0.08);
-    }
-    
-    .menu-item {
-        color: rgba(255, 255, 255, 0.9);
-    }
+  .context-menu {
+    background: rgba(20, 20, 20, 0.96);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .menu-item {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .menu-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+  }
 }
 
 @media (prefers-color-scheme: light) {
-    .context-menu {
-        background: rgba(240, 240, 240, 0.95);
-        border-color: rgba(0, 0, 0, 0.08);
-    }
-    
-    .menu-item {
-        color: rgba(0, 0, 0, 0.8);
-    }
-    
-    .menu-item:hover {
-        background: rgba(0, 0, 0, 0.05);
-        color: rgba(0, 0, 0, 0.95);
-    }
-}
+  .context-menu {
+    background: rgba(245, 245, 245, 0.96);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
 
-/* ==================== 鼠标穿透状态 ==================== */
-.container.mouse-transparent {
-    pointer-events: none;
-    opacity: 0.85;
-}
+  .menu-item {
+    color: rgba(0, 0, 0, 0.85);
+  }
 
-.container.mouse-transparent .video {
-    pointer-events: none;
-}
+  .menu-item:hover {
+    background: rgba(0, 0, 0, 0.06);
+    color: rgba(0, 0, 0, 0.95);
+  }
 
-/* ==================== 文本选择禁用 ==================== */
-.context-menu {
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-/* ==================== 滚动条隐藏 ==================== */
-::-webkit-scrollbar {
-    display: none;
-}
-
-/* ==================== 焦点轮廓禁用 ==================== */
-*:focus {
-    outline: none;
-}
-
-/* ==================== 响应式设计 ==================== */
-@media (max-width: 768px) {
-    .container {
-        width: 90vw;
-        max-width: 600px;
-    }
-    
-    .menu-item {
-        padding: 12px 16px;
-    }
+  .menu-title {
+    color: rgba(0, 0, 0, 0.5);
+  }
 }
 
 /* ==================== Windows 高对比度模式 ==================== */
 @media (prefers-contrast: more) {
-    .container {
-        border: 2px solid rgba(255, 255, 255, 0.3);
-    }
-    
-    .context-menu {
-        border: 2px solid rgba(255, 255, 255, 0.3);
-    }
-    
-    .menu-item {
-        color: #ffffff;
-    }
-    
-    .menu-item:hover {
-        background: rgba(255, 255, 255, 0.2);
-    }
+  .container {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .context-menu {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(30, 30, 30, 0.98);
+  }
+
+  .menu-item {
+    color: #ffffff;
+  }
+
+  .menu-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
 }
 
-/* ==================== 减少运动模式 ==================== */
+/* ==================== 减少运动模式（可访问性） ==================== */
 @media (prefers-reduced-motion: reduce) {
-    .container,
-    .menu-item,
-    .context-menu {
-        transition: none;
-    }
-    
-    @keyframes menuSlideIn {
-        from {
-            opacity: 1;
-        }
-        to {
-            opacity: 1;
-        }
-    }
+  .container,
+  .menu-item,
+  .context-menu,
+  #conversionProgress {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* ==================== 文本选择禁用 ==================== */
+.context-menu,
+.menu-item,
+.menu-title {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ==================== 滚动条隐藏 ==================== */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* ==================== 焦点轮廓 ==================== */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.2);
+  outline-offset: 2px;
 }
 
 /* ==================== 打印隐藏 ==================== */
 @media print {
-    .container,
-    .context-menu,
-    #conversionProgress {
-        display: none !important;
-    }
+  .container,
+  .context-menu,
+  #conversionProgress {
+    display: none !important;
+  }
+}
+
+/* ==================== 响应式设计 ==================== */
+@media (max-width: 768px) {
+  .container {
+    width: 90vw;
+    max-width: 600px;
+  }
+
+  .menu-item {
+    padding: 12px 16px;
+  }
 }
